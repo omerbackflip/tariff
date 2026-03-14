@@ -95,6 +95,7 @@ export default {
             importData: [], // EXCEL
             links: [
                 {icon: 'folder', text: 'טבלת הטבלאות', route: '/'},
+                {icon: 'folder', text: 'בינארית', route: '/BinaritList'},
                 {icon: 'folder', text: 'קליטת אקסל', route: null, import: 'EXCEL', onClick: 'runModal'},
             ],
             displayDay: '',

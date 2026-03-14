@@ -11,5 +11,10 @@ export default new Router({
       name: "table-list",
       component: () => import("./components/TableList")
     },
+    {
+      path: "/BinaritList",
+      name: "binarit-list",
+      component: () => import("./components/BinaritList")
+    }
   ]
 });

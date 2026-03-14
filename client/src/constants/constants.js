@@ -1,4 +1,5 @@
 export const TABLE_MODEL = 'tables';
+export const BINARIT_MODEL = 'binarits';
 
 import apiService from "../services/apiService";
 
