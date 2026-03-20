@@ -5,7 +5,7 @@ exports.getExcelToSave = (data) => {
         let documents = [];
         data.forEach(item => {
         let document = { 
-                ///// binarit Table
+                ///// binarit and dekel are similar tables 
                 chapter: item.chapter,
                 topic: item.topic,
                 item: item.item,
@@ -13,6 +13,11 @@ exports.getExcelToSave = (data) => {
                 description: item.description,
                 unit: item.unit,
                 price: item.price,
+
+                ///// table table
+                // table_id: 9,
+                // table_code: item.table_code,
+                // description: item.description,
             };
             documents.push(document);
         });

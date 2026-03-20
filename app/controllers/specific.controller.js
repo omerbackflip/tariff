@@ -1,5 +1,5 @@
 const db = require("../models");
-const UPLOAD_MODEL = db.binarits;
+const UPLOAD_MODEL = db.dekels; // Change this to the appropriate model for Excel uploads (e.g., db.dekels if you want to save to dekels collection)
 const csv = require('csvtojson');
 var fs = require('fs');
 const XLSX = require('xlsx');
@@ -8,8 +8,6 @@ const specificService = require("../services/specific-service");
 const { url } = require("../config/db.config");
 const path = require('path');
 const { ServerApp } = require("../config/constants");
-const { google } = require('googleapis');
-const googleService = require('../services/google-service');
 
 // const { HOLDER_MODEL } = require("../../client/src/constants/constants");
 // const HOLDER_MODEL = db.holders;
@@ -78,73 +76,6 @@ exports.deletePic = async(req, res) => {
 	}
 }
 
-exports.googleConnectionStatus = async (req, res) => {
-	try{
-		let auth = await googleService.getAuth();
-		if(auth instanceof google.auth.OAuth2){
-			const userInfo = await googleService.getUser(auth);
-			const username = (userInfo != false ? userInfo.name : null);
-			let token = JSON.parse(fs.readFileSync(ServerApp.configFolderPath + 'token.json'));
-			const { access_token,refresh_token } = token;
-			await googleService.refreshAccessToken(auth,refresh_token);
-			// Small delay to ensure file is written (only needed if issue persists)
-			await new Promise(resolve => setTimeout(resolve, 50));
-			token = JSON.parse(fs.readFileSync(ServerApp.configFolderPath + 'token.json'));
-			const credentials = JSON.parse(fs.readFileSync(ServerApp.configFolderPath + 'google-credentials.json'));
-  			const { client_secret, client_id} = credentials.web;
-  			const developer_key = ServerApp.google.apiKeyForPicker;
-  			const locale = ServerApp.google.locale;
-			res.send({
-				connected: true,
-				username: username,
-				client_secret:client_secret,
-				client_id:client_id,
-				developerKey:developer_key,
-				locale: locale,
-				access_token:access_token,
-				folderId:ServerApp.google.pickerRootFolder
-			});
-		}else{
-			res.send({
-				connected: false,
-				authUrl: auth
-			});
-		}
-	} catch (error) {
-		console.log(error)
-		res.status(500).send({
-			message: "Error while checking google connection."
-		});
-	}
-};
-
-exports.googleAuthHandler = async (req, res) => {
-	try{
-
-		const oAuth2Client = googleService.getAuthClient();
-		const code = req.query.code;
-
-		googleService.getToken(oAuth2Client, code);
-
-		res.redirect(`${process.env.CLIENT_URL}?success=true`);
-
-	} catch (error) {
-		console.log(error)
-		res.status(500).send({
-			message: "Error while checking google connection."
-		});
-	}
-};
-
-exports.syncGoogleSheets = async (req, res) => {
-	try {
-		let newLeads = await googleService.fetchNewRows(UPLOAD_MODEL);
-		res.json({ success: true, message: `${newLeads} leads where imported`});
-	} catch (error) {
-		console.error("Error syncing Google Sheets:", error);
-		res.status(500).json({ success: false, message: "Error syncing Google Sheets" });
-	}
-};
 
 exports.bulkWriteControl = async (req, res) => {
 	try {

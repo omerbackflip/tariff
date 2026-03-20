@@ -8,13 +8,21 @@ export default new Router({
   routes: [
     {
       path: "/",
+      redirect: {
+        name: "item-table",
+        params: { tableModel: "binarits" }
+      }
+    },
+    {
+      path: "/table-list",
       name: "table-list",
       component: () => import("./components/TableList")
     },
     {
-      path: "/BinaritList",
-      name: "binarit-list",
-      component: () => import("./components/BinaritList")
+      path: "/item-table/:tableModel",
+      name: "item-table",
+      component: () => import("./components/ItemTable"),
+      props: true
     }
   ]
 });

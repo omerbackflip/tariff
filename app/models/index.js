@@ -9,5 +9,6 @@ db.url = dbConfig.url;
 
 db.tables = require("./table.model.js")(mongoose);
 db.binarits = require("./binarit.model.js")(mongoose);
+db.dekels = require("./dekel.model.js")(mongoose);
 
 module.exports = db; 

@@ -17,20 +17,12 @@ class SpecificServiceEndPoints {
 		return await axios.get(`${baseUrl}/specific/get-database-info`);
 	}
 
-  async getGoogleConnectionStatus(){
-    return await axios.get(`${baseUrl}/specific/get-google-connection-status`);
-  }
-
   savePic(data) {
     return http.post("specific/save-pic", data);
   }
   
   deletePic(data) {
     return http.post("specific/delete-pic", data);
-  }
-
-  syncGoogleSheets(data) {
-    return http.get("specific/sync-google-sheets", data);
   }
   
   bulkWriteApi(data,params) {

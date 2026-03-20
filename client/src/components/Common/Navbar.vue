@@ -37,25 +37,12 @@
         </v-app-bar>
         <v-navigation-drawer app v-model="drawer" class="primary" temporary>
             <v-list>
-                <v-list-item v-for="link in links" :key="link.text" router @click="navigate(link)">
-                <!-- <v-list-item v-for="link in links" :key="link.text" router :to="link.route"> -->
+                <v-list-item v-for="link in links" :key="link.text" @click="navigate(link)">
                     <v-list-item-action>
                         <v-icon class="white--text">{{link.icon}}</v-icon>
                     </v-list-item-action>
                     <v-list-item-content>
                         <v-list-item-title class="white--text">{{link.text}}</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
-                <v-list-item @click="checkGoogleConnection()">
-                    <v-list-item-action>
-                        <v-icon class="white--text">
-                            links
-                        </v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title v-model="googleConnectMenuItem" class="white--text">
-                            {{ googleConnectMenuItem }}
-                        </v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
             </v-list>
@@ -75,7 +62,6 @@ import Vue from "vue";
 import moment from "moment";
 import { isMobile } from '../../constants/constants';
 import SpecificServiceEndPoints from "../../services/specificServiceEndPoints";
-import { checkGoogleStatus } from "@/utils/commonService";
 
 Vue.filter("formatDate", function (value) {
 	if (value) {
@@ -91,11 +77,12 @@ export default {
         return {
             drawer: false,
             openImportModal: false,
-            googleConnectMenuItem: 'Google (Not Connected)',
+            openItemTableModal: false,
             importData: [], // EXCEL
             links: [
-                {icon: 'folder', text: 'טבלת הטבלאות', route: '/'},
-                {icon: 'folder', text: 'בינארית', route: '/BinaritList'},
+                {icon: 'folder', text: 'בינארית2', route: { name: 'item-table', params: { tableModel: 'binarits' } }},
+                {icon: 'folder', text: 'דקל2', route: { name: 'item-table', params: { tableModel: 'dekels' } }},
+                {icon: 'folder', text: 'טבלת הטבלאות', route: '/table-list'},
                 {icon: 'folder', text: 'קליטת אקסל', route: null, import: 'EXCEL', onClick: 'runModal'},
             ],
             displayDay: '',
@@ -120,7 +107,6 @@ export default {
         },
 
         runModal(importData) {
-            // console.log(importData)
             switch (importData) {
                 case 'INVOICES' :
                     this.importData = "INVOICES";
@@ -137,10 +123,7 @@ export default {
 
         navigate(link) {
             if(link.route) {
-                if (this.$route.path != link.route) { // avoid calling same route
-                    this.activeComponent = link.route;
-                    this.$router.push({ path: link.route , query: this.query || {}});
-                }
+                this.$router.push(link.route); // use the object directly
             } else {
                 this[link.onClick](link.import);
             }
@@ -161,19 +144,11 @@ export default {
 
             }
         },
-
-        async checkGoogleConnection() {
-            console.log('checkGoogleConnection Running');
-             await checkGoogleStatus((menuItem) => {
-                this.googleConnectMenuItem = menuItem;
-            });
-        },
     },
     computed: {
     },
     async mounted() {
         this.getDatabaseInformation();
-        this.checkGoogleConnection();
         this.role = localStorage.getItem('TariffAuthenticated'); // 'admin' or 'viewer'
     },
 }

@@ -1,5 +1,6 @@
 export const TABLE_MODEL = 'tables';
 export const BINARIT_MODEL = 'binarits';
+export const DEKEL_MODEL = 'dekels';
 
 import apiService from "../services/apiService";
 

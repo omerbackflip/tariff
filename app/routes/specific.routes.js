@@ -15,9 +15,5 @@ module.exports = app => {
 	router.post("/delete-pic", specific.deletePic);
 	router.post("/bulk-write", specific.bulkWriteControl);
 
-  //Google auth  
-  router.get("/get-google-connection-status", specific.googleConnectionStatus);
-  router.get("/google-auth-handler", specific.googleAuthHandler); // in looks not used - it is not called from specificServiceEndPoints.js like other functions
-  router.get("/sync-google-sheets", specific.syncGoogleSheets);
   app.use('/api/specific', router);
 };
