@@ -5,24 +5,26 @@
           <v-toolbar-title class="font-weight-bold">
             {{tableModel}}
             <div v-if="itemTableList.length" class="subtitle-2 grey--text text--darken-1">
-              {{ itemTableList[0].description }} - {{ itemTableList.length - 1 }}
+              {{ subtitleText }}
             </div>
           </v-toolbar-title>
         <v-spacer/>
-      <v-row class="mr-4 justify-center align-center" dense>
-        <v-col v-for="item in chapterList" :key="item.table_code" cols="auto" class="pa-0 mb-1">
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-chip v-bind="attrs" v-on="on" small 
-                      :input-value="chapter === Number(item.table_code)" 
-                      @click="changeChapter(Number(item.table_code))">
-                {{ item.table_code }}
-              </v-chip>
-            </template>
-            <span>{{ item.description }}</span>
-          </v-tooltip>
-        </v-col>
-      </v-row>
+        <v-row class="mr-4 justify-center align-center" dense>
+          <v-col v-for="item in chapterList" :key="item.table_code" cols="auto" class="pa-0 mb-1">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-chip v-bind="attrs" v-on="on" small 
+                        :input-value="chapter === Number(item.table_code)" 
+                        :color="chapter === Number(item.table_code) ? 'primary' : 'grey lighten-3'"
+                        :text-color="chapter === Number(item.table_code) ? 'white' : 'black'"
+                        @click="changeChapter(Number(item.table_code))">
+                  {{ item.table_code }}
+                </v-chip>
+              </template>
+              <span>{{ item.description }}</span>
+            </v-tooltip>
+          </v-col>
+        </v-row>
         <v-text-field v-model="search" append-icon="mdi-magnify" label="חיפוש" single-line hide-details dense outlined clearable class="mr-4" style="max-width:250px"/>
       </v-toolbar>
       <v-data-table
@@ -42,8 +44,11 @@
       >
         <template v-slot:[`item.fullId`]="{ item }">
           <div class="d-flex justify-start">
-              {{ item.fullId }}
+              <span v-html="highlight(item.fullId, search)"></span>
           </div>
+        </template>
+        <template v-slot:[`item.description`]="{ item }">
+          <div v-html="highlight(item.description, search)"></div>
         </template>
         <template v-slot:[`item.price`]="{ item }">
           <div class="text-right font-weight-medium">
@@ -76,6 +81,7 @@ export default {
       isLoading: false,
       chapterList: [],
       chapter: 1,
+      subtitle: '',
       headers: [
         { text: "מספר", value: "fullId", align: "center" },
         { text: "Description", value: "description" },
@@ -88,14 +94,32 @@ export default {
 
   computed: {
     filteredList() {
-      // Apply search filtering first
-      let list = this.itemTableList.slice(1)  // skip first item
-      if (!this.search) return list
-      const s = this.search.toLowerCase()
-      return list.filter(i =>
-        (i.description && i.description.toLowerCase().includes(s)) ||
-        (i.fullId && i.fullId.toLowerCase().includes(s))
-      )
+      let list = this.itemTableList
+      if (this.search) {
+        // Search on whole table when search is active
+        const s = this.search.toLowerCase()
+        list = list.filter(i =>
+          (i.description && i.description.toLowerCase().includes(s)) ||
+          (i.fullId && i.fullId.toLowerCase().includes(s))
+        )
+        // No chapter filter during search
+      } else {
+        // Filter by chapter when no search
+        list = list.filter(item => item.chapter === this.chapter)
+        // Skip first row when filtering by chapter
+        list = list.slice(1)
+      }
+      return list
+    },
+
+    subtitleText() {
+      if (this.search) {
+        return `Search results: ${this.filteredList.length} items`
+      } else {
+        const chapterItems = this.itemTableList.filter(item => item.chapter === this.chapter)
+        if (!chapterItems.length) return ''
+        return `${chapterItems[0].description} - ${chapterItems.length - 1}`
+      }
     }
   },
 
@@ -104,10 +128,17 @@ export default {
       return Number(price).toLocaleString()
     },
 
+    highlight(text, search) {
+      if (!search || !text) return text
+      const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const regex = new RegExp(`(${escapedSearch})`, 'gi')
+      return text.replace(regex, '<mark>$1</mark>')
+    },
+
     retrieveList() {
       this.isLoading = true
-      let chapter = this.chapter
-      apiService.clientGetEntities(this.tableModel,{ chapter })
+      // Load all data without chapter filter for faster local filtering
+      apiService.clientGetEntities(this.tableModel,{})
       .then(response => {this.itemTableList = Object.freeze(response.data)})
       .catch(console.log)
       .finally(() => {this.isLoading = false})
@@ -115,7 +146,7 @@ export default {
 
     changeChapter(chapter) {
       this.chapter = chapter
-      this.retrieveList()
+      // No need to retrieveList, data is already loaded
     },
 
     deleteOne(id) {
@@ -147,7 +178,7 @@ export default {
       immediate: true,
       async handler() {
         this.chapter = 1 // reset when model changes
-        const table_code = this.tableModel === "binarits" ? 8 : 9
+        const table_code = this.tableModel === "binarits" ? 8 : 9 // 8 or 9 are hardcoded table_code in table model.
         this.chapterList = [] // optional loading state
         const chapterList = (await loadTable(table_code))
           .sort((a, b) => a.table_code - b.table_code)
@@ -171,6 +202,11 @@ export default {
 
 .v-row {
   flex-wrap: wrap;
+}
+
+mark {
+  background-color: yellow;
+  padding: 0 2px;
 }
 
 </style>
