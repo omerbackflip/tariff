@@ -1,8 +1,0 @@
-{
-  "name": "pdf",
-  "version": "1.0.0",
-  "main": "index.js",
-  "dependencies": {
-    "html2pdf.js": "^0.10.1"
-  }
-}
