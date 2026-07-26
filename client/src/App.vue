@@ -20,7 +20,7 @@
 <script>
 import Navbar from './components/Common/Navbar.vue'
 import LoginForm from './components/shared/login'
-import { loadTable } from "../src/constants/constants.js";
+import { loadTable, TABLE_IDS } from "../src/constants/constants.js";
 
 export default {
   name: "app",
@@ -33,7 +33,7 @@ export default {
     };
   },
   async mounted() {
-    this.userInfo = (await loadTable(90));
+    this.userInfo = (await loadTable(TABLE_IDS.USERS));
   },
   created() {
     const authFlag = localStorage.getItem('TariffAuthenticated');
@@ -44,7 +44,7 @@ export default {
   methods: {
   async handleLogin({ username, password }) {
     // חפש את המשתמש הנכון מתוך רשימת המשתמשים
-    const foundUser = this.userInfo.find(u => u.table_id === 90 && u.description === username && u.GDFileId === password);
+    const foundUser = this.userInfo.find(u => u.table_id === TABLE_IDS.USERS && u.description === username && u.GDFileId === password);
 
     if (foundUser) {
       this.isAuthenticated = true;

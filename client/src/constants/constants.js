@@ -1,6 +1,12 @@
 export const TABLE_MODEL = 'tables';
 export const BINARIT_MODEL = 'binarits';
 export const DEKEL_MODEL = 'dekels';
+export const TABLE_IDS = Object.freeze({
+  CATALOG: 99,
+  USERS: 90,
+  BINARIT_CHAPTERS: 8,
+  DEKEL_CHAPTERS: 9,
+});
 
 import apiService from "../services/apiService";
 

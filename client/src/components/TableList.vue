@@ -236,7 +236,7 @@
 </template>
 
 <script>
-import { TABLE_MODEL } from '../constants/constants';
+import { TABLE_IDS, TABLE_MODEL } from '../constants/constants';
 import apiService from '../services/apiService';
 
 export default {
@@ -277,7 +277,7 @@ export default {
       apiService.clientGetEntities(TABLE_MODEL)
         .then((response) => {
           this.tables = response.data;
-          this.tableID = response.data.filter(item => item.table_id === 99);
+          this.tableID = response.data.filter(item => item.table_id === TABLE_IDS.CATALOG);
           this.updateTableCode();
         })
         .catch((e) => {

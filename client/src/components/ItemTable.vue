@@ -63,7 +63,7 @@
 <script>
 
 import apiService from '../services/apiService'
-import { loadTable } from '../constants/constants'
+import { loadTable, TABLE_IDS } from '../constants/constants'
 
 export default {
 	props: {
@@ -178,9 +178,11 @@ export default {
       immediate: true,
       async handler() {
         this.chapter = 1 // reset when model changes
-        const table_code = this.tableModel === "binarits" ? 8 : 9 // 8 or 9 are hardcoded table_code in table model.
+        const tableId = this.tableModel === "binarits"
+          ? TABLE_IDS.BINARIT_CHAPTERS
+          : TABLE_IDS.DEKEL_CHAPTERS
         this.chapterList = [] // optional loading state
-        const chapterList = (await loadTable(table_code))
+        const chapterList = (await loadTable(tableId))
           .sort((a, b) => a.table_code - b.table_code)
         this.chapterList = chapterList
         await this.retrieveList()
